@@ -1,0 +1,24 @@
+{
+  "name": "AbsenNgaji Semampir",
+  "short_name": "AbsenNgaji",
+  "description": "Aplikasi Presensi dan Informasi Jamaah Desa Semampir",
+  "start_url": "/absenngaji/dashboard.php",
+  "display": "standalone",
+  "background_color": "#f4f7f6",
+  "theme_color": "#1a535c",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
