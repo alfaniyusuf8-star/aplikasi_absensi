@@ -96,9 +96,9 @@ if (isset($_POST['login'])) {
 <body>
 
 <div class="login-card text-center">
-    <i class="fa fa-mosque fa-3x text-warning mb-3"></i>
-    <h3 class="fw-bold text-dark mb-1">AbsenNgaji</h3>
-    <p class="text-muted small mb-4">Sistem Presensi & Perizinan Jamaah</p>
+    <img src="icon-192.png" alt="Logo" style="width: 35px; height: 35px; border-radius: 8px; object-fit: cover;" class="me-2 shadow-sm">
+    <h3 class="fw-bold text-dark mb-1">Gemasemampir</h3>
+    <p class="text-muted small mb-4">Pusat Aktivitas Jamaah Desa Semampir</p>
 
     <form action="" method="POST" class="text-start">
         <div class="mb-3">
