@@ -105,13 +105,13 @@ if (!$is_pengawas) {
     
     $my_gender = $me['jenis_kelamin'];
     $target_gender = ($my_gender == 'L') ? 'P' : 'L';
-    $teks_target = ($target_gender == 'P') ? 'Mudi / Akhwat' : 'Muda / Ikhwan';
+    $teks_target = ($target_gender == 'P') ? 'Mudi' : 'Muda';
     
     $filter_gender_sql = "AND b.jenis_kelamin = '$target_gender'";
     $filter_siap_sql = ""; 
 
 } else {
-    $teks_target = 'Seluruh Muda-Mudi (Ikhwan & Akhwat)';
+    $teks_target = 'Seluruh Muda-Mudi';
     $filter_gender_sql = ""; 
     $filter_siap_sql = ""; 
 }
@@ -271,8 +271,8 @@ while($row = mysqli_fetch_assoc($query_kandidat)) {
                 <div class="col-6">
                     <select name="f_gender" class="form-select form-select-sm border-danger text-secondary">
                         <option value="">L / P (Semua)</option>
-                        <option value="L" <?= ($f_gender == 'L') ? 'selected' : ''; ?>>Ikhwan (L)</option>
-                        <option value="P" <?= ($f_gender == 'P') ? 'selected' : ''; ?>>Akhwat (P)</option>
+                        <option value="L" <?= ($f_gender == 'L') ? 'selected' : ''; ?>>Muda (L)</option>
+                        <option value="P" <?= ($f_gender == 'P') ? 'selected' : ''; ?>>Mudi (P)</option>
                     </select>
                 </div>
                 <?php endif; ?>
