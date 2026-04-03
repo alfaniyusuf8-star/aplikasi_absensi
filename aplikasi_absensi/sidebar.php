@@ -1,8 +1,10 @@
 <?php
+// Pastikan session dan koneksi sudah ada sebelum file ini di-include
 $current_page = basename($_SERVER['PHP_SELF']);
 $lvl_sidebar = isset($_SESSION['level']) ? $_SESSION['level'] : 'karyawan';
 $id_user_sidebar = isset($_SESSION['id_user']) ? $_SESSION['id_user'] : 0;
 
+// Ambil data utama user
 $q_utama = mysqli_query($conn, "
     SELECT u.level, u.kelompok, b.jenjang, b.status_pernikahan, b.foto, b.tempat_lahir, b.no_hp, b.alamat_surabaya 
     FROM users u 
@@ -11,6 +13,7 @@ $q_utama = mysqli_query($conn, "
 ");
 $d_utama = mysqli_fetch_assoc($q_utama);
 
+// Cek jabatan rangkap
 $q_rangkap = mysqli_query($conn, "SELECT * FROM jabatan_rangkap WHERE id_user = '$id_user_sidebar'");
 $punya_rangkap = (mysqli_num_rows($q_rangkap) > 0);
 
@@ -19,6 +22,7 @@ function formatJabatan($lvl) {
     return ucwords(str_replace('_', ' ', $lvl));
 }
 
+// Hitung Notifikasi
 $jml_notif = 0;
 if(isset($conn)) {
     $q_notif = mysqli_query($conn, "SELECT COUNT(*) as total FROM notifikasi WHERE id_user = '$id_user_sidebar' AND is_read = 0");
@@ -28,10 +32,8 @@ if(isset($conn)) {
     }
 }
 
-// 1. SEMUA PENGURUS (Termasuk Admin Jenjang Kelompok & Desa)
+// Konfigurasi Akses
 $akses_semua_pengurus = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'keimaman', 'ketua_mudai_desa', 'admin_mudai_desa', 'ketua_mudai', 'admin_mudai', 'admin_remaja', 'admin_praremaja', 'admin_caberawit'];
-
-// 2. PENGURUS INTI SAJA (Hanya untuk Data KK)
 $akses_pengurus_inti = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'keimaman'];
 ?>
 
@@ -39,7 +41,7 @@ $akses_pengurus_inti = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'k
 <meta name="theme-color" content="#1a535c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="AbsenNgaji">
+<meta name="apple-mobile-web-app-title" content="GemaSemampir">
 <link rel="apple-touch-icon" href="icon-192.png">
 <link rel="stylesheet" href="style_mobile.css">
 
@@ -64,37 +66,18 @@ $akses_pengurus_inti = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'k
     .menu-list-item:hover { background: #f8fafc; color: #1a535c; }
     .menu-icon { width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #e2e8f0; color: #1a535c; margin-right: 15px; font-size: 1rem;}
 
-    /* ========================================== */
-    /* CUSTOM BOTTOM SHEET (POPUP MENU) STYLE     */
-    /* ========================================== */
-    .menu-backdrop {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.5);
-        z-index: 1020; /* Di bawah navbar bawah, tapi nutupin konten */
-        opacity: 0; visibility: hidden;
-        transition: 0.3s ease-in-out;
-    }
-    .popup-menu {
-        position: fixed; bottom: -100%; left: 0; width: 100%;
-        background: #ffffff;
-        border-radius: 25px 25px 0 0;
-        box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
-        z-index: 1030; /* Tepat di bawah navbar (1040) agar kesannya muncul dari belakang */
-        padding: 20px 20px 85px 20px; /* Padding bawah ekstra biar list ga ketutup navbar */
-        max-height: 85vh; overflow-y: auto;
-        transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    }
+    /* CUSTOM BOTTOM SHEET (POPUP MENU) */
+    .menu-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1020; opacity: 0; visibility: hidden; transition: 0.3s ease-in-out; }
+    .popup-menu { position: fixed; bottom: -100%; left: 0; width: 100%; background: #ffffff; border-radius: 25px 25px 0 0; box-shadow: 0 -5px 20px rgba(0,0,0,0.15); z-index: 1030; padding: 20px 20px 85px 20px; max-height: 85vh; overflow-y: auto; transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
     .popup-menu.active { bottom: 0; }
     .menu-backdrop.active { opacity: 1; visibility: visible; }
 </style>
 
 <div class="app-topbar">
     <div class="d-flex align-items-center">
-        <img src="icon-192.png" alt="Logo AbsenNgaji" style="width: 35px; height: 35px; border-radius: 8px; object-fit: cover;" class="me-2 shadow-sm">
-        
+        <img src="icon-192.png" alt="Logo" style="width: 35px; height: 35px; border-radius: 8px; object-fit: cover;" class="me-2 shadow-sm">
         <h5 class="fw-bold text-dark mb-0" style="letter-spacing: -0.5px;">Gemasemampir</h5>
     </div>
-...
     <div class="d-flex align-items-center gap-3">
         <a href="notifikasi.php" class="text-dark text-decoration-none position-relative">
             <i class="fa fa-bell fs-5"></i>
@@ -110,9 +93,7 @@ $akses_pengurus_inti = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'k
     </div>
 </div>
 
-
 <div class="menu-backdrop" id="menuBackdrop" onclick="toggleMenu()"></div>
-
 <div class="popup-menu" id="popupMenu">
     <div class="text-center mb-3">
         <div style="width: 50px; height: 5px; background: #cbd5e1; border-radius: 5px; margin: 0 auto;"></div>
@@ -143,35 +124,10 @@ $akses_pengurus_inti = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'k
         <div class="bg-white rounded-4 shadow-sm border mb-4 overflow-hidden">
             <a href="dashboard_keimaman.php" class="menu-list-item"><div class="menu-icon bg-success bg-opacity-10 text-success"><i class="fa fa-chart-pie"></i></div> <b>Dashboard Admin</b></a>
             <a href="data_jamaah.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-users"></i></div> <b>Data Jamaah</b></a>
-            
             <?php if(in_array($lvl_sidebar, $akses_pengurus_inti)): ?>
                 <a href="data_kk.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-sitemap"></i></div> <b>Data Kartu Keluarga</b></a>
             <?php endif; ?>
-            
-            <?php if($lvl_sidebar == 'superadmin'): ?>
-                <a href="import_massal.php" class="menu-list-item"><div class="menu-icon bg-warning bg-opacity-25 text-dark"><i class="fa fa-file-excel"></i></div> <b class="text-danger">Import Massal</b></a>
-            <?php endif; ?>
-
-            <a href="rekap_jamaah.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-chart-bar"></i></div> <b>Rekapitulasi Jamaah</b></a>
-            <a href="rekap_absensi.php" class="menu-list-item"><div class="menu-icon bg-primary bg-opacity-10 text-primary"><i class="fa fa-chart-line"></i></div> <b>Rekap Kehadiran</b></a>
-            <a href="rapor_jamaah.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-clipboard-list"></i></div> <b>Rapor Individu</b></a>
-            
-            <?php if(in_array($lvl_sidebar, ['keimaman', 'keimaman_desa', 'ketua_mudai_desa', 'admin_mudai_desa', 'ketua_mudai', 'admin_mudai', 'admin_remaja', 'admin_praremaja', 'admin_caberawit'])): ?>
-                <a href="kelola_izin.php" class="menu-list-item border-0"><div class="menu-icon bg-info bg-opacity-10 text-info"><i class="fa fa-check-double"></i></div> <b>Validasi Izin</b></a>
-            <?php endif; ?>
-        </div>
-    <?php endif; ?>
-
-    <?php if(in_array($lvl_sidebar, ['superadmin', 'keimaman_desa', 'keimaman', 'tim_dhuafa_desa', 'tim_dhuafa', 'tim_pnkb_desa', 'tim_pnkb'])): ?>
-        <h6 class="fw-bold text-muted small mb-2 ps-2">PANEL KHUSUS</h6>
-        <div class="bg-white rounded-4 shadow-sm border mb-4 overflow-hidden">
-            <?php if(in_array($lvl_sidebar, ['superadmin', 'keimaman_desa', 'keimaman', 'tim_dhuafa_desa', 'tim_dhuafa'])): ?>
-                <a href="data_dhuafa.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-hand-holding-heart"></i></div> <b>Data Dhuafa</b></a>
-            <?php endif; ?>
-            <?php if(in_array($lvl_sidebar, ['superadmin', 'keimaman_desa', 'keimaman', 'tim_pnkb_desa', 'tim_pnkb'])): ?>
-                <a href="data_pnkb.php" class="menu-list-item"><div class="menu-icon bg-danger bg-opacity-10 text-danger"><i class="fa fa-ring"></i></div> <b>Data PNKB</b></a>
-                <a href="pantau_taaruf.php" class="menu-list-item border-0"><div class="menu-icon bg-warning bg-opacity-10 text-warning"><i class="fa fa-envelope-open-text"></i></div> <b>Pantau Pengajuan Ta'aruf</b></a>
-            <?php endif; ?>
+            <a href="rekap_absensi.php" class="menu-list-item border-0"><div class="menu-icon bg-primary bg-opacity-10 text-primary"><i class="fa fa-chart-line"></i></div> <b>Rekap Kehadiran</b></a>
         </div>
     <?php endif; ?>
 
@@ -179,16 +135,15 @@ $akses_pengurus_inti = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'k
         <?php if($punya_rangkap || $d_utama['level'] != 'karyawan'): ?>
             <button class="btn btn-outline-primary fw-bold py-3 rounded-pill" onclick="toggleMenu()" data-bs-toggle="modal" data-bs-target="#modalSwitchRole"><i class="fa fa-sync-alt me-2"></i> Ganti Peran Akun</button>
         <?php endif; ?>
-        <a href="logout.php" onclick="return confirm('Apakah Anda yakin ingin keluar dari aplikasi?');" class="btn btn-danger fw-bold py-3 rounded-pill shadow-sm"><i class="fa fa-sign-out-alt me-2"></i> Keluar Aplikasi</a>
+        <a href="logout.php" onclick="return confirm('Yakin ingin keluar?');" class="btn btn-danger fw-bold py-3 rounded-pill shadow-sm"><i class="fa fa-sign-out-alt me-2"></i> Keluar Aplikasi</a>
     </div>
 </div>
-
 
 <div class="app-bottom-nav">
     <a href="dashboard.php" class="nav-item <?= ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
         <i class="fa fa-home"></i><span>Beranda</span>
     </a>
-    <a href="bursa_taaruf.php" class="nav-item <?= ($current_page == 'bursa_taaruf.php' || $current_page == 'pantau_taaruf.php') ? 'active text-danger' : ''; ?>">
+    <a href="bursa_taaruf.php" class="nav-item <?= ($current_page == 'bursa_taaruf.php') ? 'active' : ''; ?>">
         <i class="fa fa-heart"></i><span>Ta'aruf</span>
     </a>
     
@@ -203,69 +158,64 @@ $akses_pengurus_inti = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'k
     <a href="bursa_usaha.php" class="nav-item <?= ($current_page == 'bursa_usaha.php') ? 'active' : ''; ?>">
         <i class="fa fa-store"></i><span>Bursa</span>
     </a>
-    
     <a href="javascript:void(0);" onclick="toggleMenu()" class="nav-item">
         <i class="fa fa-bars"></i><span>Menu</span>
     </a>
 </div>
 
-
-<div class="modal fade" id="modalSwitchRole" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
-            <div class="modal-header bg-dark text-white border-0">
-                <h5 class="modal-title fw-bold"><i class="fa fa-sync-alt me-2"></i>Pilih Peran</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body p-3 bg-light">
-                <div class="list-group shadow-sm">
-                    <form action="switch_role.php" method="POST" class="m-0">
-                        <input type="hidden" name="new_level" value="<?= $d_utama['level']; ?>">
-                        <input type="hidden" name="new_kelompok" value="<?= $d_utama['kelompok']; ?>">
-                        <button type="submit" class="list-group-item list-group-item-action py-3 <?= ($lvl_sidebar == $d_utama['level']) ? 'active bg-primary border-primary' : ''; ?>">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div><h6 class="mb-1 fw-bold"><?= formatJabatan($d_utama['level']); ?></h6><small>Kel. <?= $d_utama['kelompok']; ?></small></div>
-                                <?php if($lvl_sidebar == $d_utama['level']): ?><i class="fa fa-check-circle fs-4 text-primary"></i><?php endif; ?>
-                            </div>
-                        </button>
-                    </form>
-                    <?php if($punya_rangkap): mysqli_data_seek($q_rangkap, 0); while($rangkap = mysqli_fetch_assoc($q_rangkap)): ?>
-                        <form action="switch_role.php" method="POST" class="m-0 border-top">
-                            <input type="hidden" name="new_level" value="<?= $rangkap['level']; ?>">
-                            <input type="hidden" name="new_kelompok" value="<?= $rangkap['kelompok']; ?>">
-                            <button type="submit" class="list-group-item list-group-item-action py-3 <?= ($lvl_sidebar == $rangkap['level']) ? 'active bg-primary border-primary' : ''; ?>">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div><h6 class="mb-1 fw-bold"><?= formatJabatan($rangkap['level']); ?></h6><small>Kel. <?= $rangkap['kelompok']; ?></small></div>
-                                    <?php if($lvl_sidebar == $rangkap['level']): ?><i class="fa fa-check-circle fs-4 text-primary"></i><?php endif; ?>
-                                </div>
-                            </button>
-                        </form>
-                    <?php endwhile; endif; ?>
-                    <?php if($d_utama['level'] != 'karyawan'): ?>
-                        <form action="switch_role.php" method="POST" class="m-0 border-top">
-                            <input type="hidden" name="new_level" value="karyawan">
-                            <input type="hidden" name="new_kelompok" value="<?= $d_utama['kelompok']; ?>">
-                            <button type="submit" class="list-group-item list-group-item-action py-3 <?= ($lvl_sidebar == 'karyawan') ? 'active bg-primary border-primary' : ''; ?>">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div><h6 class="mb-1 fw-bold">Jamaah (Personal)</h6><small>Mode Biasa</small></div>
-                                    <?php if($lvl_sidebar == 'karyawan'): ?><i class="fa fa-check-circle fs-4 text-primary"></i><?php endif; ?>
-                                </div>
-                            </button>
-                        </form>
-                    <?php endif; ?>
-                </div>
-            </div>
+<div id="install-banner" style="display:none; position:fixed; bottom:85px; left:50%; transform:translateX(-50%); width:92%; background: #ffffff; color:#333; padding:15px; border-radius:15px; text-align:left; z-index:999; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #eee;">
+    <div class="d-flex align-items-center mb-3">
+        <img src="icon-192.png" style="width: 45px; height: 45px; border-radius: 10px; margin-right: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+        <div>
+            <h6 class="fw-bold mb-0" style="font-size: 0.95rem;">Pasang GemaSemampir</h6>
+            <small class="text-muted" style="font-size: 0.75rem;">Akses lebih cepat & hemat kuota</small>
         </div>
+    </div>
+    <div class="d-flex gap-2">
+        <button id="btn-install" class="btn fw-bold flex-grow-1 shadow-sm" style="background: #1a535c; color: white; border-radius: 8px; font-size: 0.85rem; padding: 10px;">PASANG SEKARANG</button>
+        <button id="btn-close" class="btn btn-light fw-bold" style="border-radius: 8px; font-size: 0.85rem; padding: 10px; border: 1px solid #ddd;">NANTI</button>
     </div>
 </div>
 
 <script>
+    // Menu Toggle Script
     function toggleMenu() {
         const popup = document.getElementById('popupMenu');
         const backdrop = document.getElementById('menuBackdrop');
-        
-        // Membuka atau menutup menu hanya dengan diklik, bebas bug swipe
         popup.classList.toggle('active');
         backdrop.classList.toggle('active');
     }
+
+    // PWA Installer Script
+    let deferredPrompt;
+    const installBanner = document.getElementById('install-banner');
+    const btnInstall = document.getElementById('btn-install');
+    const btnClose = document.getElementById('btn-close');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        if (!sessionStorage.getItem('pwa_banner_closed')) {
+            setTimeout(() => {
+                installBanner.style.display = 'block';
+            }, 4000);
+        }
+    });
+
+    btnInstall.addEventListener('click', (e) => {
+        installBanner.style.display = 'none';
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+            deferredPrompt = null;
+        });
+    });
+
+    btnClose.addEventListener('click', () => {
+        installBanner.style.display = 'none';
+        sessionStorage.setItem('pwa_banner_closed', 'true');
+    });
+
+    window.addEventListener('appinstalled', (evt) => {
+        installBanner.style.display = 'none';
+    });
 </script>
