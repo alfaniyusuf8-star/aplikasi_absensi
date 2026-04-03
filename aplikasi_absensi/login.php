@@ -96,7 +96,7 @@ if (isset($_POST['login'])) {
 <body>
 
 <div class="login-card text-center">
-    <img src="icon-192.png" alt="Logo" style="width: 35px; height: 35px; border-radius: 8px; object-fit: cover;" class="me-2 shadow-sm">
+    <img src="icon-192.png" alt="Logo" style="width: 75px; height: 75px; border-radius: 8px; object-fit: cover;" class="me-2 shadow-sm">
     <h3 class="fw-bold text-dark mb-1">Gemasemampir</h3>
     <p class="text-muted small mb-4">Pusat Aktivitas Jamaah Desa Semampir</p>
 
