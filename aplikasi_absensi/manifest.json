@@ -1,11 +1,11 @@
 {
-  "name": "AbsenNgaji Semampir",
-  "short_name": "AbsenNgaji",
-  "description": "Aplikasi Presensi dan Informasi Jamaah Desa Semampir",
-  "start_url": "/absenngaji/dashboard.php",
+  "name": "Gemasemampir",
+  "short_name": "Gemasemampir",
+  "description": "Aplikasi Semua Aktivitas Jamaah Desa Semampir",
+ "start_url": "/login.php",
   "display": "standalone",
-  "background_color": "#f4f7f6",
-  "theme_color": "#1a535c",
+  "background_color": "#FFFFFF",
+  "theme_color": "#1b8366",
   "orientation": "portrait-primary",
   "icons": [
     {

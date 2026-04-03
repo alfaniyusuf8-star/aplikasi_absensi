@@ -1,46 +1,45 @@
-const CACHE_NAME = 'absenngaji-v1';
+// Ganti ke v3 agar iPhone terpaksa download versi baru
+const CACHE_NAME = 'absenngaji-v3';
+
 const urlsToCache = [
   '/',
-  '/dashboard.php',
-  '/manifest.json'
-  // Anda bisa menambahkan file CSS atau gambar penting lainnya di sini
+  '/manifest.json',
+  '/style_mobile.css',
+  '/icon-192.png',
+  '/icon-512.png'
 ];
 
 // Install Service Worker
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Opened cache');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(urlsToCache);
+    })
   );
 });
 
-// Fetch Data (Agar bisa loading lebih cepat / offline ringan)
+// Strategi Fetch yang AMAN untuk iPhone
 self.addEventListener('fetch', event => {
+  // JIKA yang diakses adalah file .php, JANGAN lewat cache (Langsung ke Internet)
+  // Ini kunci agar redirect login tidak error di Safari
+  if (event.request.url.includes('.php')) {
+    return; // Biarkan browser menangani secara normal
+  }
+
+  // Selain file .php (seperti gambar/css), gunakan cache jika ada
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      })
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });
 
-// Update Service Worker jika ada versi baru
+// Bersihkan cache lama
 self.addEventListener('activate', event => {
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
-        cacheNames.map(cacheName => {
-          if (cacheWhitelist.indexOf(cacheName) === -1) {
-            return caches.delete(cacheName);
-          }
-        })
+        cacheNames.filter(name => name !== CACHE_NAME).map(name => caches.delete(name))
       );
     })
   );

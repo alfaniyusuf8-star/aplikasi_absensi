@@ -1,8 +1,8 @@
 <?php
 $host = "localhost";
-$user = "root";
-$pass = "";
-$db   = "aplikasi_absensi"; // Pastikan nama ini sama dengan di phpMyAdmin
+$user = "admin_absen";
+$pass = "PasswordRahasia123!";
+$db   = "absenngaji"; // Pastikan nama ini sama dengan di phpMyAdmin
 
 $conn = mysqli_connect($host, $user, $pass, $db);
 

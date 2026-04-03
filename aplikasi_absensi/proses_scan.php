@@ -72,9 +72,12 @@ try {
     }
 
     // 5. Simpan Data Kehadiran
-    $tgl_sekarang = date('Y-m-d H:i:s');
-    $insert = mysqli_query($conn, "INSERT INTO presensi (id_user, id_kegiatan, tgl_presensi, status_absen) 
-                                   VALUES ('$id_user_scan', '$id_kegiatan', '$tgl_sekarang', 'tepat waktu')");
+    $tgl_sekarang = date('Y-m-d H:i:s'); // Format lengkap (Tanggal + Jam)
+    $hanya_tanggal = date('Y-m-d');      // Format khusus tanggal saja
+
+    // Kita tambahkan kolom 'tanggal' ke dalam query
+    $insert = mysqli_query($conn, "INSERT INTO presensi (id_user, id_kegiatan, tanggal, tgl_presensi, status_absen) 
+                                   VALUES ('$id_user_scan', '$id_kegiatan', '$hanya_tanggal', '$tgl_sekarang', 'tepat waktu')");
 
     if ($insert) {
         echo json_encode(['status' => 'success', 'pesan' => "$nama_jamaah berhasil tercatat HADIR."]);

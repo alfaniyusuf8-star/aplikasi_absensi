@@ -46,25 +46,55 @@ $akses_pengurus_inti = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'k
 <style>
     body { background: #f4f7f6; font-family: 'Inter', sans-serif; padding-top: 60px; padding-bottom: 80px; -webkit-tap-highlight-color: transparent;}
     .main-content { margin-left: 0 !important; padding: 15px !important; }
+    
+    /* TOPBAR */
     .app-topbar { background: #fff; height: 60px; position: fixed; top: 0; left: 0; right: 0; z-index: 1030; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-    .app-bottom-nav { background: #fff; height: 65px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1030; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 15px rgba(0,0,0,0.05); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 0 10px; }
-    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #a0aec0; width: 60px; transition: 0.3s; }
+    
+    /* BOTTOM NAVIGATION */
+    .app-bottom-nav { background: #fff; height: 65px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 1040; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 -2px 15px rgba(0,0,0,0.05); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 0 10px; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; text-decoration: none; color: #a0aec0; width: 60px; transition: 0.3s; cursor: pointer;}
     .nav-item.active { color: #1a535c; }
     .nav-item i { font-size: 1.3rem; margin-bottom: 3px; }
     .nav-item.active i { font-size: 1.4rem; transform: translateY(-2px); }
     .nav-item span { font-size: 0.65rem; font-weight: 600; }
     .nav-fab { background: linear-gradient(135deg, #1a535c, #4ecdc4); width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white !important; font-size: 1.5rem; box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4); transform: translateY(-20px); border: 4px solid #f4f7f6; }
-    .offcanvas-bottom { height: 85vh !important; border-top-left-radius: 25px; border-top-right-radius: 25px; }
+    
+    /* LIST MENU */
     .menu-list-item { display: flex; align-items: center; padding: 15px; text-decoration: none; color: #333; border-bottom: 1px solid #f1f5f9; }
     .menu-list-item:hover { background: #f8fafc; color: #1a535c; }
     .menu-icon { width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; background: #e2e8f0; color: #1a535c; margin-right: 15px; font-size: 1rem;}
+
+    /* ========================================== */
+    /* CUSTOM BOTTOM SHEET (POPUP MENU) STYLE     */
+    /* ========================================== */
+    .menu-backdrop {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1020; /* Di bawah navbar bawah, tapi nutupin konten */
+        opacity: 0; visibility: hidden;
+        transition: 0.3s ease-in-out;
+    }
+    .popup-menu {
+        position: fixed; bottom: -100%; left: 0; width: 100%;
+        background: #ffffff;
+        border-radius: 25px 25px 0 0;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.15);
+        z-index: 1030; /* Tepat di bawah navbar (1040) agar kesannya muncul dari belakang */
+        padding: 20px 20px 85px 20px; /* Padding bawah ekstra biar list ga ketutup navbar */
+        max-height: 85vh; overflow-y: auto;
+        transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .popup-menu.active { bottom: 0; }
+    .menu-backdrop.active { opacity: 1; visibility: visible; }
 </style>
 
 <div class="app-topbar">
     <div class="d-flex align-items-center">
-        <i class="fa fa-mosque fs-4 text-primary me-2"></i>
-        <h5 class="fw-bold text-dark mb-0" style="letter-spacing: -0.5px;">AbsenNgaji</h5>
+        <img src="icon-192.png" alt="Logo AbsenNgaji" style="width: 35px; height: 35px; border-radius: 8px; object-fit: cover;" class="me-2 shadow-sm">
+        
+        <h5 class="fw-bold text-dark mb-0" style="letter-spacing: -0.5px;">Gemasemampir</h5>
     </div>
+...
     <div class="d-flex align-items-center gap-3">
         <a href="notifikasi.php" class="text-dark text-decoration-none position-relative">
             <i class="fa fa-bell fs-5"></i>
@@ -79,6 +109,80 @@ $akses_pengurus_inti = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'k
         </span>
     </div>
 </div>
+
+
+<div class="menu-backdrop" id="menuBackdrop" onclick="toggleMenu()"></div>
+
+<div class="popup-menu" id="popupMenu">
+    <div class="text-center mb-3">
+        <div style="width: 50px; height: 5px; background: #cbd5e1; border-radius: 5px; margin: 0 auto;"></div>
+    </div>
+    <h5 class="fw-bold text-center mb-4 mt-2">Menu Utama</h5>
+    
+    <div class="d-flex align-items-center bg-light p-3 rounded-4 mb-4 border">
+        <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width:50px; height:50px; font-size: 1.5rem;"><i class="fa fa-user"></i></div>
+        <div>
+            <h6 class="fw-bold mb-0 text-dark"><?= $_SESSION['username'] ?? 'Jamaah'; ?></h6>
+            <span class="badge bg-warning text-dark mt-1"><i class="fa fa-shield-alt me-1"></i> <?= formatJabatan($lvl_sidebar); ?></span>
+        </div>
+    </div>
+
+    <h6 class="fw-bold text-muted small mb-2 ps-2">PRIBADI SAYA</h6>
+    <div class="bg-white rounded-4 shadow-sm border mb-4 overflow-hidden">
+        <a href="isi_biodata.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-address-card"></i></div> <b>Biodata Saya</b></a>
+        <a href="pengaturan_akun.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-cog"></i></div> <b>Pengaturan Akun</b></a>
+        <a href="notifikasi.php" class="menu-list-item">
+            <div class="menu-icon bg-warning bg-opacity-25 text-warning"><i class="fa fa-bell"></i></div> <b class="flex-grow-1">Notifikasi</b>
+            <?php if($jml_notif > 0): ?><span class="badge bg-danger rounded-pill"><?= $jml_notif; ?></span><?php endif; ?>
+        </a>
+        <a href="riwayat_jamaah.php" class="menu-list-item border-0"><div class="menu-icon bg-info bg-opacity-10 text-info"><i class="fa fa-history"></i></div> <b>Riwayat Absensi</b></a>
+    </div>
+
+    <?php if(in_array($lvl_sidebar, $akses_semua_pengurus)): ?>
+        <h6 class="fw-bold text-muted small mb-2 ps-2">PANEL PENGURUS</h6>
+        <div class="bg-white rounded-4 shadow-sm border mb-4 overflow-hidden">
+            <a href="dashboard_keimaman.php" class="menu-list-item"><div class="menu-icon bg-success bg-opacity-10 text-success"><i class="fa fa-chart-pie"></i></div> <b>Dashboard Admin</b></a>
+            <a href="data_jamaah.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-users"></i></div> <b>Data Jamaah</b></a>
+            
+            <?php if(in_array($lvl_sidebar, $akses_pengurus_inti)): ?>
+                <a href="data_kk.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-sitemap"></i></div> <b>Data Kartu Keluarga</b></a>
+            <?php endif; ?>
+            
+            <?php if($lvl_sidebar == 'superadmin'): ?>
+                <a href="import_massal.php" class="menu-list-item"><div class="menu-icon bg-warning bg-opacity-25 text-dark"><i class="fa fa-file-excel"></i></div> <b class="text-danger">Import Massal</b></a>
+            <?php endif; ?>
+
+            <a href="rekap_jamaah.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-chart-bar"></i></div> <b>Rekapitulasi Jamaah</b></a>
+            <a href="rekap_absensi.php" class="menu-list-item"><div class="menu-icon bg-primary bg-opacity-10 text-primary"><i class="fa fa-chart-line"></i></div> <b>Rekap Kehadiran</b></a>
+            <a href="rapor_jamaah.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-clipboard-list"></i></div> <b>Rapor Individu</b></a>
+            
+            <?php if(in_array($lvl_sidebar, ['keimaman', 'keimaman_desa', 'ketua_mudai_desa', 'admin_mudai_desa', 'ketua_mudai', 'admin_mudai', 'admin_remaja', 'admin_praremaja', 'admin_caberawit'])): ?>
+                <a href="kelola_izin.php" class="menu-list-item border-0"><div class="menu-icon bg-info bg-opacity-10 text-info"><i class="fa fa-check-double"></i></div> <b>Validasi Izin</b></a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if(in_array($lvl_sidebar, ['superadmin', 'keimaman_desa', 'keimaman', 'tim_dhuafa_desa', 'tim_dhuafa', 'tim_pnkb_desa', 'tim_pnkb'])): ?>
+        <h6 class="fw-bold text-muted small mb-2 ps-2">PANEL KHUSUS</h6>
+        <div class="bg-white rounded-4 shadow-sm border mb-4 overflow-hidden">
+            <?php if(in_array($lvl_sidebar, ['superadmin', 'keimaman_desa', 'keimaman', 'tim_dhuafa_desa', 'tim_dhuafa'])): ?>
+                <a href="data_dhuafa.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-hand-holding-heart"></i></div> <b>Data Dhuafa</b></a>
+            <?php endif; ?>
+            <?php if(in_array($lvl_sidebar, ['superadmin', 'keimaman_desa', 'keimaman', 'tim_pnkb_desa', 'tim_pnkb'])): ?>
+                <a href="data_pnkb.php" class="menu-list-item"><div class="menu-icon bg-danger bg-opacity-10 text-danger"><i class="fa fa-ring"></i></div> <b>Data PNKB</b></a>
+                <a href="pantau_taaruf.php" class="menu-list-item border-0"><div class="menu-icon bg-warning bg-opacity-10 text-warning"><i class="fa fa-envelope-open-text"></i></div> <b>Pantau Pengajuan Ta'aruf</b></a>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="d-grid gap-2 mb-2">
+        <?php if($punya_rangkap || $d_utama['level'] != 'karyawan'): ?>
+            <button class="btn btn-outline-primary fw-bold py-3 rounded-pill" onclick="toggleMenu()" data-bs-toggle="modal" data-bs-target="#modalSwitchRole"><i class="fa fa-sync-alt me-2"></i> Ganti Peran Akun</button>
+        <?php endif; ?>
+        <a href="logout.php" onclick="return confirm('Apakah Anda yakin ingin keluar dari aplikasi?');" class="btn btn-danger fw-bold py-3 rounded-pill shadow-sm"><i class="fa fa-sign-out-alt me-2"></i> Keluar Aplikasi</a>
+    </div>
+</div>
+
 
 <div class="app-bottom-nav">
     <a href="dashboard.php" class="nav-item <?= ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
@@ -99,82 +203,12 @@ $akses_pengurus_inti = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'k
     <a href="bursa_usaha.php" class="nav-item <?= ($current_page == 'bursa_usaha.php') ? 'active' : ''; ?>">
         <i class="fa fa-store"></i><span>Bursa</span>
     </a>
-    <a href="#offcanvasMenu" data-bs-toggle="offcanvas" class="nav-item">
+    
+    <a href="javascript:void(0);" onclick="toggleMenu()" class="nav-item">
         <i class="fa fa-bars"></i><span>Menu</span>
     </a>
 </div>
 
-<div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasMenu">
-    <div class="offcanvas-header justify-content-center border-bottom pb-2 pt-3 position-relative">
-        <div style="width: 50px; height: 5px; background: #cbd5e1; border-radius: 5px; position: absolute; top: 10px;"></div>
-        <h5 class="offcanvas-title fw-bold mt-2">Menu Utama</h5>
-    </div>
-    <div class="offcanvas-body px-3 pb-5">
-        
-        <div class="d-flex align-items-center bg-light p-3 rounded-4 mb-4 border">
-            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3 shadow-sm" style="width:50px; height:50px; font-size: 1.5rem;"><i class="fa fa-user"></i></div>
-            <div>
-                <h6 class="fw-bold mb-0 text-dark"><?= $_SESSION['username'] ?? 'Jamaah'; ?></h6>
-                <span class="badge bg-warning text-dark mt-1"><i class="fa fa-shield-alt me-1"></i> <?= formatJabatan($lvl_sidebar); ?></span>
-            </div>
-        </div>
-
-        <h6 class="fw-bold text-muted small mb-2 ps-2">PRIBADI SAYA</h6>
-        <div class="bg-white rounded-4 shadow-sm border mb-4 overflow-hidden">
-            <a href="isi_biodata.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-address-card"></i></div> <b>Biodata Saya</b></a>
-            <a href="pengaturan_akun.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-cog"></i></div> <b>Pengaturan Akun</b></a>
-            <a href="notifikasi.php" class="menu-list-item">
-                <div class="menu-icon bg-warning bg-opacity-25 text-warning"><i class="fa fa-bell"></i></div> <b class="flex-grow-1">Notifikasi</b>
-                <?php if($jml_notif > 0): ?><span class="badge bg-danger rounded-pill"><?= $jml_notif; ?></span><?php endif; ?>
-            </a>
-            <a href="riwayat_jamaah.php" class="menu-list-item"><div class="menu-icon bg-info bg-opacity-10 text-info"><i class="fa fa-history"></i></div> <b>Riwayat Absensi</b></a>
-        </div>
-
-        <?php if(in_array($lvl_sidebar, $akses_semua_pengurus)): ?>
-            <h6 class="fw-bold text-muted small mb-2 ps-2">PANEL PENGURUS</h6>
-            <div class="bg-white rounded-4 shadow-sm border mb-4 overflow-hidden">
-                <a href="dashboard_keimaman.php" class="menu-list-item"><div class="menu-icon bg-success bg-opacity-10 text-success"><i class="fa fa-chart-pie"></i></div> <b>Dashboard Admin</b></a>
-                <a href="data_jamaah.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-users"></i></div> <b>Data Jamaah</b></a>
-                
-                <?php if(in_array($lvl_sidebar, $akses_pengurus_inti)): ?>
-                    <a href="data_kk.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-sitemap"></i></div> <b>Data Kartu Keluarga</b></a>
-                <?php endif; ?>
-                
-                <?php if($lvl_sidebar == 'superadmin'): ?>
-                    <a href="import_massal.php" class="menu-list-item"><div class="menu-icon bg-warning bg-opacity-25 text-dark"><i class="fa fa-file-excel"></i></div> <b class="text-danger">Import Massal</b></a>
-                <?php endif; ?>
-
-                <a href="rekap_jamaah.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-chart-bar"></i></div> <b>Rekapitulasi Jamaah</b></a>
-                <a href="rekap_absensi.php" class="menu-list-item"><div class="menu-icon bg-primary bg-opacity-10 text-primary"><i class="fa fa-chart-line"></i></div> <b>Rekap Kehadiran</b></a>
-                <a href="rapor_jamaah.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-clipboard-list"></i></div> <b>Rapor Individu</b></a>
-                
-               <?php if(in_array($lvl_sidebar, ['keimaman', 'keimaman_desa', 'ketua_mudai_desa', 'admin_mudai_desa', 'ketua_mudai', 'admin_mudai', 'admin_remaja', 'admin_praremaja', 'admin_caberawit'])): ?>
-    <a href="kelola_izin.php" class="menu-list-item"><div class="menu-icon bg-info bg-opacity-10 text-info"><i class="fa fa-check-double"></i></div> <b>Validasi Izin</b></a>
-<?php endif; ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if(in_array($lvl_sidebar, ['superadmin', 'keimaman_desa', 'keimaman', 'tim_dhuafa_desa', 'tim_dhuafa', 'tim_pnkb_desa', 'tim_pnkb'])): ?>
-            <h6 class="fw-bold text-muted small mb-2 ps-2">PANEL KHUSUS</h6>
-            <div class="bg-white rounded-4 shadow-sm border mb-4 overflow-hidden">
-                <?php if(in_array($lvl_sidebar, ['superadmin', 'keimaman_desa', 'keimaman', 'tim_dhuafa_desa', 'tim_dhuafa'])): ?>
-                    <a href="data_dhuafa.php" class="menu-list-item"><div class="menu-icon"><i class="fa fa-hand-holding-heart"></i></div> <b>Data Dhuafa</b></a>
-                <?php endif; ?>
-                <?php if(in_array($lvl_sidebar, ['superadmin', 'keimaman_desa', 'keimaman', 'tim_pnkb_desa', 'tim_pnkb'])): ?>
-                    <a href="data_pnkb.php" class="menu-list-item"><div class="menu-icon bg-danger bg-opacity-10 text-danger"><i class="fa fa-ring"></i></div> <b>Data PNKB</b></a>
-                    <a href="pantau_taaruf.php" class="menu-list-item"><div class="menu-icon bg-warning bg-opacity-10 text-warning"><i class="fa fa-envelope-open-text"></i></div> <b>Pantau Pengajuan Ta'aruf</b></a>
-                <?php endif; ?>
-            </div>
-        <?php endif; ?>
-
-        <div class="d-grid gap-2 mt-4 mb-5">
-            <?php if($punya_rangkap || $d_utama['level'] != 'karyawan'): ?>
-                <button class="btn btn-outline-primary fw-bold py-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#modalSwitchRole" data-bs-dismiss="offcanvas"><i class="fa fa-sync-alt me-2"></i> Ganti Peran Akun</button>
-            <?php endif; ?>
-            <a href="logout.php" onclick="return confirm('Apakah Anda yakin ingin keluar dari aplikasi?');" class="btn btn-danger fw-bold py-3 rounded-pill shadow-sm"><i class="fa fa-sign-out-alt me-2"></i> Keluar Aplikasi</a>
-        </div>
-    </div>
-</div>
 
 <div class="modal fade" id="modalSwitchRole" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -226,24 +260,12 @@ $akses_pengurus_inti = ['superadmin', 'admin_desa', 'admin', 'keimaman_desa', 'k
 </div>
 
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('sw.js');
-  });
-}
-document.addEventListener('DOMContentLoaded', function() {
-    const offcanvasMenu = document.getElementById('offcanvasMenu');
-    if (offcanvasMenu) {
-        let touchStartY = 0, touchStartX = 0;
-        offcanvasMenu.addEventListener('touchstart', e => { touchStartY = e.changedTouches[0].screenY; touchStartX = e.changedTouches[0].screenX; }, {passive: true});
-        offcanvasMenu.addEventListener('touchend', e => {
-            let deltaY = e.changedTouches[0].screenY - touchStartY;
-            let deltaX = Math.abs(e.changedTouches[0].screenX - touchStartX);
-            if (deltaY > 50 && deltaX < 40) {
-                let bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasMenu);
-                if (bsOffcanvas) bsOffcanvas.hide();
-            }
-        }, {passive: true});
+    function toggleMenu() {
+        const popup = document.getElementById('popupMenu');
+        const backdrop = document.getElementById('menuBackdrop');
+        
+        // Membuka atau menutup menu hanya dengan diklik, bebas bug swipe
+        popup.classList.toggle('active');
+        backdrop.classList.toggle('active');
     }
-});
 </script>

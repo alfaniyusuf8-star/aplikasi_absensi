@@ -6,7 +6,6 @@ include 'koneksi.php';
 if (isset($_SESSION['id_user'])) {
     $level = $_SESSION['level'];
     
-    // Logika Pintar untuk mengarahkan kembali sesuai jabatannya
     if ($level == 'karyawan') {
         header("Location: dashboard.php");
     } else if ($level == 'tim_dhuafa_desa' || $level == 'tim_dhuafa') {
@@ -22,7 +21,6 @@ if (isset($_POST['login'])) {
     $username = mysqli_real_escape_string($conn, $_POST['username']);
     $password = $_POST['password']; 
 
-    // QUERY DENGAN LEFT JOIN UNTUK MENGAMBIL NAMA DARI TABEL BIODATA_JAMAAH
     $query_text = "SELECT u.*, b.nama_lengkap 
                    FROM users u 
                    LEFT JOIN biodata_jamaah b ON u.id_user = b.id_user 
@@ -33,30 +31,23 @@ if (isset($_POST['login'])) {
     if (mysqli_num_rows($query) > 0) {
         $data = mysqli_fetch_assoc($query);
         
-        // Pengecekan 3 Lapis: password_verify (Hash), Teks Biasa, dan MD5
         if (password_verify($password, $data['password']) || $password == $data['password'] || md5($password) == $data['password']) {
             
             $_SESSION['id_user']  = $data['id_user'];
             $_SESSION['username'] = $data['username'];
             $_SESSION['level']    = $data['level'];
             $_SESSION['kelompok'] = $data['kelompok'];
-
-            // LOGIKA PENGAMBILAN NAMA:
-            // Jika nama_lengkap di biodata_jamaah ada isinya, pakai itu.
-            // Jika kosong (belum isi bio), pakai username sebagai cadangan.
             $_SESSION['nama'] = !empty($data['nama_lengkap']) ? $data['nama_lengkap'] : $data['username'];
 
-            // REDIRECT BERDASARKAN LEVEL SETELAH LOGIN SUKSES
-           // CONTOH LOGIKA REDIRECT YANG BENAR:
-if ($data['level'] == 'karyawan') {
-    header("Location: dashboard.php");
-} else if ($data['level'] == 'tim_dhuafa_desa' || $data['level'] == 'tim_dhuafa') {
-    header("Location: dashboard_dhuafa.php");
-} else if ($data['level'] == 'tim_pnkb_desa' || $data['level'] == 'tim_pnkb') {
-    header("Location: data_pnkb.php"); // Arahkan PNKB ke halamannya
-} else {
-    header("Location: dashboard_keimaman.php");
-}
+            if ($data['level'] == 'karyawan') {
+                header("Location: dashboard.php");
+            } else if ($data['level'] == 'tim_dhuafa_desa' || $data['level'] == 'tim_dhuafa') {
+                header("Location: dashboard_dhuafa.php");
+            } else if ($data['level'] == 'tim_pnkb_desa' || $data['level'] == 'tim_pnkb') {
+                header("Location: data_pnkb.php");
+            } else {
+                header("Location: dashboard_keimaman.php");
+            }
             exit;
             
         } else {
@@ -73,15 +64,34 @@ if ($data['level'] == 'karyawan') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | AbsenNgaji</title>
+    <title>Login | AbsenNgaji Semampir</title>
+
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1a535c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="AbsenNgaji">
+    <link rel="apple-touch-icon" href="/icon-192.png">
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         body { background: #1a535c; font-family: 'Inter', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
         .login-card { background: #ffffff; border-radius: 15px; padding: 40px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 100%; max-width: 400px; }
         .btn-custom { background: #4ecdc4; color: #1a535c; font-weight: bold; border: none; }
         .btn-custom:hover { background: #3dbab1; color: #1a535c; }
     </style>
+
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then(reg => console.log('PWA BERHASIL TERDAFTAR!', reg.scope))
+            .catch(err => console.error('PWA GAGAL TERDAFTAR:', err));
+        });
+      }
+    </script>
 </head>
 <body>
 

@@ -1,7 +1,8 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 session_start();
-include 'koneksi.php';
-date_default_timezone_set('Asia/Jakarta');
+include 'koneksi.php';date_default_timezone_set('Asia/Jakarta');
 
 // KETUA & KEIMAMAN DILARANG MASUK, TAMBAHAN ADMIN MUDAI DESA
 $allowed_levels = ['superadmin', 'admin_desa', 'admin', 'admin_mudai', 'admin_mudai_desa', 'admin_remaja', 'admin_praremaja', 'admin_caberawit'];
@@ -43,7 +44,6 @@ if (isset($_POST['simpan_pengajian'])) {
 
     $kelompok_array = [];
     if ($is_pusat) {
-        // Ambil data kelompok yang dicentang
         $kelompok_array = $_POST['target_kelompok'] ?? [];
         $tempat_pilihan = $_POST['tempat_pilihan'] ?? 'Desa';
         
@@ -52,16 +52,14 @@ if (isset($_POST['simpan_pengajian'])) {
             exit;
         }
     } else {
-        // Jika Admin Kelompok biasa, target & lokasi dipaksa ke kelompoknya sendiri
         $kelompok_array = [$kelompok_admin];
         $tempat_pilihan = $kelompok_admin;
     }
 
-    // Deteksi apakah menggunakan Titik GPS Manual (Outdoor/Gedung Sewaan)
     $is_manual = (!empty($_POST['is_manual']) && $_POST['is_manual'] == '1');
-    $lat_manual = mysqli_real_escape_string($conn, $_POST['lat_pusat']);
-    $lng_manual = mysqli_real_escape_string($conn, $_POST['lng_pusat']);
-    $tempat_manual = mysqli_real_escape_string($conn, $_POST['tempat_pengajian']);
+    $lat_manual = mysqli_real_escape_string($conn, $_POST['lat_pusat'] ?? '');
+    $lng_manual = mysqli_real_escape_string($conn, $_POST['lng_pusat'] ?? '');
+    $tempat_manual = mysqli_real_escape_string($conn, $_POST['tempat_pengajian'] ?? '');
 
     // Tentukan Lokasi Final
     if ($is_manual && $lat_manual != '') {
@@ -69,32 +67,45 @@ if (isset($_POST['simpan_pengajian'])) {
         $lat_final = $lat_manual;
         $lng_final = $lng_manual;
     } else {
-        $tempat_final = $db_lokasi[$tempat_pilihan]['tempat'];
-        $lat_final = $db_lokasi[$tempat_pilihan]['lat'];
-        $lng_final = $db_lokasi[$tempat_pilihan]['lng'];
+        // [PERBAIKAN 1]: Mengatasi error jika nama kelompok di database memakai huruf kecil (misal: 'semampir')
+        $kunci_tempat = ucfirst(strtolower($tempat_pilihan)); 
+        
+        if (isset($db_lokasi[$kunci_tempat])) {
+            $tempat_final = $db_lokasi[$kunci_tempat]['tempat'];
+            $lat_final = $db_lokasi[$kunci_tempat]['lat'];
+            $lng_final = $db_lokasi[$kunci_tempat]['lng'];
+        } else {
+            // Jika nama kelompok tidak ada di kamus, amankan dengan titik default Desa
+            $tempat_final = $db_lokasi['Desa']['tempat'];
+            $lat_final = $db_lokasi['Desa']['lat'];
+            $lng_final = $db_lokasi['Desa']['lng'];
+        }
     }
 
     // Proses Looping untuk membuat kegiatan majemuk
     $insert_berhasil = true;
+    $pesan_error = ""; // [PERBAIKAN 2]: Penampung pesan error dari MariaDB
+
     foreach($kelompok_array as $kel) {
-        // Perhatikan: Target kelompoknya beda-beda (sesuai centang), tapi TEMPAT-nya SAMA (sesuai Dropdown/Manual)
         $query_insert = "INSERT INTO kegiatan (judul_pengajian, materi, tempat_pengajian, link_zoom, lat_pusat, lng_pusat, target_kelompok, target_jenjang, status_buka, status_izin, tgl_buat, is_selesai) 
                          VALUES ('$judul', '$materi', '$tempat_final', '$link_zoom', '$lat_final', '$lng_final', '$kel', '$target_jenjang', 0, 0, '$tgl_buat', 0)";
         
         if(!mysqli_query($conn, $query_insert)) {
             $insert_berhasil = false;
+            $pesan_error = mysqli_error($conn); // Tangkap laporan detail kegagalannya
         }
     }
 
     if($insert_berhasil) {
-        // =========================================================================
-        // SUNTIKAN NOTIFIKASI BROADCAST (KE SELURUH JAMAAH)
-        // =========================================================================
-        kirim_notif_semua($conn, "Pengajian Baru: $judul 🕌", "Jadwal pengajian baru untuk jenjang $target_jenjang telah ditambahkan. Silakan cek aplikasi untuk informasi lebih lanjut.", "dashboard.php");
+        // [PERBAIKAN 3]: Mencegah Blank Page karena Fungsi Notif belum ada
+        if (function_exists('kirim_notif_semua')) {
+            kirim_notif_semua($conn, "Pengajian Baru: $judul ??", "Jadwal pengajian baru untuk jenjang $target_jenjang telah ditambahkan.", "dashboard.php");
+        }
         
-        echo "<script>alert('Alhamdulillah! Jadwal berhasil dibuat dan disebar ke kelompok yang dituju.'); window.location='riwayat_pengajian.php';</script>";
+        echo "<script>alert('Alhamdulillah! Jadwal berhasil dibuat dan disebar.'); window.location='riwayat_pengajian.php';</script>";
     } else {
-        echo "<script>alert('Terjadi kesalahan database!');</script>";
+        // Menampilkan pesan error asli di layar agar ketahuan tabel/kolom apa yang bermasalah
+        echo "<script>alert('Gagal menyimpan! Detail Error Database: " . $pesan_error . "');</script>";
     }
 }
 ?>

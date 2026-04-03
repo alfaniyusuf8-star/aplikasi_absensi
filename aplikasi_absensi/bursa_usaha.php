@@ -111,7 +111,7 @@ $q_usaha_saya = mysqli_query($conn, "SELECT * FROM usaha_jamaah WHERE id_user = 
 
 <div class="main-content">
     <div class="header-bursa shadow-sm mb-4">
-        <h2 class="fw-bold mb-2">🛍️ Bursa Usaha & Profesi</h2>
+        <h2 class="fw-bold mb-2"> Bursa Usaha & Profesi</h2>
         <p class="mb-3 opacity-75">Klik kartu usaha untuk melihat detail informasi.</p>
         <div class="d-flex gap-2">
             <button class="btn btn-warning fw-bold rounded-pill px-4 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahUsaha"><i class="fa fa-plus-circle me-1"></i> Tambah Usaha</button>
@@ -124,9 +124,9 @@ $q_usaha_saya = mysqli_query($conn, "SELECT * FROM usaha_jamaah WHERE id_user = 
             <div class="col-md-4">
                 <select name="kategori" class="form-select border-info fw-bold">
                     <option value="">-- Semua Kategori --</option>
-                    <option value="Jasa / Teknisi" <?= ($f_kategori == 'Jasa / Teknisi') ? 'selected' : ''; ?>>🛠️ Jasa / Teknisi</option>
-                    <option value="Kuliner / Makanan" <?= ($f_kategori == 'Kuliner / Makanan') ? 'selected' : ''; ?>>🍔 Kuliner / Makanan</option>
-                    <option value="Barang / Produk" <?= ($f_kategori == 'Barang / Produk') ? 'selected' : ''; ?>>📦 Barang / Produk Dagang</option>
+                    <option value="Jasa / Teknisi" <?= ($f_kategori == 'Jasa / Teknisi') ? 'selected' : ''; ?>> Jasa / Teknisi</option>
+                    <option value="Kuliner / Makanan" <?= ($f_kategori == 'Kuliner / Makanan') ? 'selected' : ''; ?>> Kuliner / Makanan</option>
+                    <option value="Barang / Produk" <?= ($f_kategori == 'Barang / Produk') ? 'selected' : ''; ?>> Barang / Produk Dagang</option>
                 </select>
             </div>
             <div class="col-md-6"><input type="text" name="keyword" class="form-control border-info" placeholder="Cari layanan atau produk..." value="<?= htmlspecialchars($f_keyword); ?>"></div>
@@ -203,14 +203,14 @@ $q_usaha_saya = mysqli_query($conn, "SELECT * FROM usaha_jamaah WHERE id_user = 
                     <div class="mb-3">
                         <label class="form-label fw-bold small">Kategori</label>
                         <select name="kategori" class="form-select border-primary" required>
-                            <option value="Jasa / Teknisi">🛠️ Jasa / Teknisi</option>
-                            <option value="Kuliner / Makanan">🍔 Kuliner / Makanan / Minuman</option>
-                            <option value="Barang / Produk">📦 Barang / Produk Dagang</option>
+                            <option value="Jasa / Teknisi"> Jasa / Teknisi</option>
+                            <option value="Kuliner / Makanan"> Kuliner / Makanan / Minuman</option>
+                            <option value="Barang / Produk"> Barang / Produk Dagang</option>
                         </select>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold small">Nama Usaha</label>
-                        <input type="text" name="nama_usaha" class="form-control" placeholder="Cth: DAWETEM" required>
+                        <input type="text" name="nama_usaha" class="form-control" placeholder="Cth: Warung Barokah,Jasa Pijat" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold small">Upload Foto (Maks 3 Foto)</label>
