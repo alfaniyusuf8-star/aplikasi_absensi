@@ -1,0 +1,24 @@
+{
+  "name": "Gemasemampir",
+  "short_name": "Gemasemampir",
+  "description": "Aplikasi Semua Aktivitas Jamaah Desa Semampir",
+ "start_url": "/login.php",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#1b8366",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}

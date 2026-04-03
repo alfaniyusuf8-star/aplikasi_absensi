@@ -1,0 +1,94 @@
+/* ====================================================================
+   DIET KETAT: GLOBAL MOBILE COMPACT STYLE
+   Membuat tampilan aplikasi lebih padat, ringkas, dan luas di layar HP
+==================================================================== */
+
+/* 1. MENGECILKAN UKURAN HURUF DASAR & MENGURANGI JARAK ANTAR BARIS */
+body {
+    font-size: 0.85rem !important; /* Ukuran standar dari 1rem turun ke 0.85rem */
+    line-height: 1.4 !important;
+}
+
+/* 2. MERAMPINGKAN KOTAK/KARTU (CARDS) */
+.card, .card-custom, .bg-white.rounded-4, .filter-box {
+    padding: 12px 15px !important; /* Jarak dalam kotak dikurangi */
+    margin-bottom: 12px !important; /* Jarak antar kotak dikurangi */
+    border-radius: 12px !important; /* Lengkungan sudut sedikit dikurangi */
+}
+
+/* 3. MENGECILKAN SEMUA TOMBOL (BUTTONS) */
+.btn {
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
+}
+.btn-sm {
+    padding: 4px 10px !important;
+    font-size: 0.7rem !important;
+}
+/* Tombol navigasi bawah (Beranda, Riwayat, dll) */
+.app-bottom-nav {
+    height: 55px !important; /* Bar bawah ditipiskan */
+}
+.nav-item i { font-size: 1.1rem !important; margin-bottom: 2px !important; }
+.nav-item span { font-size: 0.6rem !important; }
+.nav-fab {
+    width: 48px !important; height: 48px !important;
+    font-size: 1.2rem !important; transform: translateY(-15px) !important;
+}
+
+/* 4. MENGECILKAN KEPALA HALAMAN (HEADERS & TITLES) */
+h1, .h1 { font-size: 1.8rem !important; }
+h2, .h2 { font-size: 1.5rem !important; }
+h3, .h3 { font-size: 1.3rem !important; }
+h4, .h4 { font-size: 1.1rem !important; }
+h5, .h5 { font-size: 0.95rem !important; }
+h6, .h6 { font-size: 0.85rem !important; }
+
+/* Judul halaman (Topbar) */
+.app-topbar { height: 50px !important; }
+body { padding-top: 50px !important; padding-bottom: 65px !important; }
+.header-title, .header-taaruf { padding: 12px 15px !important; }
+
+/* 5. MERAMPINGKAN INPUT FORM (KOTAK ISIAN & PENCARIAN) */
+.form-control, .form-select, .input-group-text {
+    padding: 6px 12px !important;
+    font-size: 0.85rem !important;
+    min-height: 32px !important;
+}
+.form-control-sm, .form-select-sm {
+    padding: 4px 10px !important;
+    font-size: 0.75rem !important;
+}
+
+/* 6. MEMADATKAN DAFTAR/LIST (Data Jamaah, Rapor, dll) */
+.jamaah-item, .list-item-card, .kk-header, .rapor-item, .menu-list-item {
+    padding: 10px 12px !important; /* Jarak atas-bawah ditipiskan */
+}
+.j-avatar, .k-avatar {
+    width: 40px !important; height: 40px !important; /* Foto profil dikecilkan */
+}
+.kk-icon, .menu-icon {
+    width: 32px !important; height: 32px !important; font-size: 0.9rem !important;
+}
+
+/* 7. MENGECILKAN LENCANA (BADGES) */
+.badge {
+    padding: 3px 8px !important;
+    font-size: 0.65rem !important;
+}
+
+/* 8. MENGATUR ULANG SPASI BAWAAN BOOTSTRAP (MARGIN/PADDING CLASSES) */
+.mb-4, .my-4 { margin-bottom: 15px !important; }
+.mt-4, .my-4 { margin-top: 15px !important; }
+.pb-4, .py-4 { padding-bottom: 15px !important; }
+.pt-4, .py-4 { padding-top: 15px !important; }
+
+.mb-5, .my-5 { margin-bottom: 20px !important; }
+.p-4 { padding: 15px !important; }
+.p-5 { padding: 20px !important; }
+
+/* 9. MENGECILKAN TAB MENU GESER */
+.nav-pills-scroll .nav-link {
+    padding: 6px 15px !important;
+    font-size: 0.75rem !important;
+}
